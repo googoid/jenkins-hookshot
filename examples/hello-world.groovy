@@ -1,9 +1,3 @@
-# hello-world
-This is a basic example of a Jenkins Job DSL script. It defines a single job,
-performs a Git checkout, echoes "Hello, world!", and ships the build result
-and console output to Logstash. It is triggered as soon as the seed job runs.
-
-```groovy
 def basename = "${REPO_NAMESPACE}__${REPO_NAME}__${UUID}"
 
 job {
@@ -29,4 +23,3 @@ job {
 
 // Trigger the newly created job(s)
 queue("${basename}__test-job")
-```
