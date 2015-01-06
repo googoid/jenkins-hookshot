@@ -85,18 +85,6 @@ random Jenkins instance running on Marathon. The seed job is then triggered
 with various parameters in the payload, and the original payload is stored in
 Redis for later consumption.
 
-** Request:**
-
-```
-
-```
-
-**Response:**
-
-```
-success
-```
-
 ### `GET /ping`
 Health check; returns `pong`.
 
