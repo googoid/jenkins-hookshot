@@ -92,27 +92,27 @@ def jenkins_healthcheck(host, port):
     return result
 
 
-def ship_to_redis(namespace, repo, uuid, payload):
+def ship_to_redis(namespace, repo, uniq_id, payload):
     """Ship the original GitHub payload to Redis based on the UUID for this
     build. Track the builds for a given repo (namespace__repo) based on the
     UUID and index of the Redis list.
 
     :param namespace: GitHub username or organization (e.g. 'puppetlabs')
     :param repo: GitHub repository name (e.g. 'puppet')
-    :param uuid: UUID; randomly generated on POST event to '/v1/create'
+    :param uniq_id: UUID; randomly generated on POST event to '/v1/create'
     :param payload: the original webhook payload as a Python object
     :return: boolean; True if successful, False otherwise
     """
     r = redis.StrictRedis(host=options.redis_host)
 
     # Most recent builds (UUIDs) come first in the 'recent' list
-    r.lpush('recent', uuid)
+    r.lpush('recent', uniq_id)
 
     # Track UUIDs for individual repos (namespace__repo)
-    r.rpush('{}__{}'.format(namespace, repo), uuid)
+    r.rpush('{}__{}'.format(namespace, repo), uniq_id)
 
     # Store the original payload as a hash, with the UUID as the key
-    r.hmset(uuid, payload)
+    r.hmset(uniq_id, payload)
 
     # TODO: there should be actual error handling here
     return True

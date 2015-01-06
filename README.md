@@ -11,10 +11,6 @@ payload is stored in a database for further use.
 For more information on setting up Jenkins masters on Marathon, see this blog
 post: [Scaling Jenkins with Mesos and Marathon][5].
 
-_**Note:** this project is an experiment, a prototype. Without modification, it
-isn't suitable for a production deployment. There are yet-unresolved security
-implications in using this software. For more information, see [TODO.txt][6]._
-
 
 ## Prerequisites
   * Python 3.3 (developed and tested with Python 3.3.6)
@@ -25,10 +21,8 @@ implications in using this software. For more information, see [TODO.txt][6]._
 
 
 ## Caveats
-  * Only GitHub `ping`, `push`, and `pull_request` events are currently
-  implemented.
-  * Currently, you can't destroy old jobs using this app. We plan to support
-  that in the future.
+  * Only GitHub `ping` and `push` event actions are currently implemented.
+  * See [TODO.txt][6] for a more detailed list of tasks remaining.
 
 
 ## Usage
@@ -52,8 +46,16 @@ $ pyenv activate hookshot
 (hookshot) $ python run.py [OPTIONS]
 ```
 
-Set the configuration parameters as they apply to your environment. For a
-detailed list of the options available, run `python run.py --help`.
+Set the configuration parameters as they apply to your environment. For example,
+let's say Marathon isn't running on the same host as this app. You should use
+something like:
+
+```
+$ python run.py --marathon_host=10.141.141.10:8080
+```
+
+For a detailed list of CLI arguments (and their defaults), run
+`python run.py --help`.
 
 If you want to test this project locally, you might want to try out [ngrok][7]
 to receive hooks from GitHub.

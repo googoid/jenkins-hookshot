@@ -20,9 +20,9 @@ class CreateHandler(BaseHandler):
 
         :return: jenkins_host, jenkins_port
         """
-        attempt = 0
+        attempt = 1
         jenkins_host, jenkins_port = None, None
-        while attempt < 3:
+        while attempt <= 3:
             jenkins_host, jenkins_port = utils.get_random_marathon_task(
                 options.marathon_app_id)
             if utils.jenkins_healthcheck(jenkins_host, jenkins_port):
@@ -30,13 +30,14 @@ class CreateHandler(BaseHandler):
                 break
             else:
                 attempt += 1
+
             if attempt == 3:
                 self.write_final('Error: No available Jenkins masters.')
 
         return jenkins_host, jenkins_port
 
     def post(self):
-        id = str(uuid.uuid4())
+        uniq_id = str(uuid.uuid4())
         request = self.request
         content_type = request.headers['Content-Type']
 
@@ -84,10 +85,10 @@ class CreateHandler(BaseHandler):
                 'REPO_DESCRIPTION': payload['repository']['description'],
                 'REPO_URL': payload['repository']['url'],
                 'GIT_SHA': payload['after'],
-                'UUID': id
+                'UUID': uniq_id
             }
 
-            jenkins_job_name = "{}__{}__{}".format(namespace, repo, id)
+            jenkins_job_name = "{}__{}__{}".format(namespace, repo, uniq_id)
             if not utils.jenkins_create_job(jenkins_host, jenkins_port, jenkins_job_name):
                 self.write_final("Error: failed to create Jenkins job {} on Jenkins host {}:{}".format(
                     jenkins_job_name, jenkins_host, jenkins_port))
@@ -97,7 +98,8 @@ class CreateHandler(BaseHandler):
 
             utils.jenkins_build_with_params(jenkins_host, jenkins_port,
                                             jenkins_job_name, params)
-            utils.ship_to_redis(namespace, repo, id, payload)
+            utils.ship_to_redis(namespace, repo, uniq_id, payload)
 
         else:
             self.write_final('Error: Event type {} is not currently supported'.format(event))
+

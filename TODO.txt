@@ -1,8 +1,21 @@
-When triggering a build based on a new PR, we need to verify the user is part
-of the GitHub org, and if they're not then we need a "trigger phrase" so we're
-never (potentially) executing arbitrary code.
+Support additional webhook event types, such as 'pull_request'.
+
+When triggering a build based on a PR, we need to verify the user is part of
+the GitHub organization. If they're not, we need a "trigger phrase" so we're
+never executing arbitrary code on our testing infra.
 
 Eventually, a DestroyHandler should be implemented to clean-up completed jobs.
+This should be implemented at '/v1/destroy'.
 
-This project also needs proper logging, proper HTTP status codes, and detailed
-deployment documentation.
+Implement proper, detailed logging.
+
+Implement proper HTTP status codes (currently everything processed by this app
+shows up as HTTP 200 to GitHub).
+
+Deployment docs exist for Python apps in general, but this project could
+probably use a few examples for Supervisor, Nginx, and HAProxy. In addition,
+we should better document deployment on Marathon and HAProxy using the
+'marathon-haproxy-bridge' script provided by Mesosphere.
+
+There is no Redis error handling; the function always returns True.
+
