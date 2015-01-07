@@ -23,12 +23,6 @@ def main():
     define('github_hook_secret', default=None,
            help='GitHub webhook shared secret')
 
-    # Jenkins options
-    define('jenkins_username', default=None,
-           help='Jenkins username (if auth is enabled')
-    define('jenkins_password', default=None,
-           help='Jenkins API key or password (if auth is enabled)')
-
     tornado.options.parse_command_line()
 
     server = HTTPServer(JenkinsHookshotApp())
