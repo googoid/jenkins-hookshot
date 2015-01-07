@@ -1,6 +1,7 @@
 import json
 import uuid
 
+import tornado.web
 from tornado.options import options
 
 import jenkins_hookshot.utils as utils
@@ -32,7 +33,7 @@ class CreateHandler(BaseHandler):
                 attempt += 1
 
             if attempt == 3:
-                self.write_final('Error: No available Jenkins masters.')
+                raise tornado.web.HTTPError(500, log_message="Error: No available Jenkins masters.")
 
         return jenkins_host, jenkins_port
 
@@ -45,10 +46,13 @@ class CreateHandler(BaseHandler):
         if 'X-GitHub-Event' in request.headers:
             event = request.headers['X-GitHub-Event']
         else:
-            self.write_final('Error: X-GitHub-Event header not set.')
+            raise tornado.web.HTTPError(400,
+                                        log_message='Error: X-GitHub-Event header not set')
 
         if content_type != 'application/json':
-            self.write_final('Error: Invalid Content-Type {}'.format(content_type))
+            raise tornado.web.HTTPError(400,
+                                        log_message='Error: Invalid Content-Type {}'.format(
+                                            content_type))
 
         if options.github_hook_secret:
             # In Python 3.3, the string passed to HMAC must be of type 'bytes'.
@@ -57,22 +61,24 @@ class CreateHandler(BaseHandler):
             secret = options.github_hook_secret.encode('utf-8')
 
             if not utils.validate_payload_hash(request, secret):
-                self.write_final("Error: Unable to validate payload hash.")
+                raise tornado.web.HTTPError(400,
+                                            log_message='Error: Unable to validate payload hash.')
 
         try:
             payload = json.loads(request.body.decode('utf-8'))
         except:
-            self.write_final('Error: Unable to load JSON.')
+            raise tornado.web.HTTPError(400, log_message='Error: Unable to load JSON.')
 
         # Get a random Jenkins instance and ensure it's actually alive
         jenkins_host, jenkins_port = self.get_random_jenkins_master()
 
         # Actions based on the event type
         if event == 'ping':
-            self.write_final('pong')
+            self.finish('pong')
         elif event == 'pull_request':
             # TODO: implement 'pull_request' processor
-            pass
+            raise tornado.web.HTTPError(501,
+                                        log_message="pull_request processing not yet implemented.")
         elif event == 'push':
             namespace = payload['repository']['full_name'].split('/')[0]
             repo = payload['repository']['full_name'].split('/')[1]
@@ -89,17 +95,22 @@ class CreateHandler(BaseHandler):
             }
 
             jenkins_job_name = "{}__{}__{}".format(namespace, repo, uniq_id)
-            if not utils.jenkins_create_job(jenkins_host, jenkins_port, jenkins_job_name):
-                self.write_final("Error: failed to create Jenkins job {} on Jenkins host {}:{}".format(
-                    jenkins_job_name, jenkins_host, jenkins_port))
+            if not utils.jenkins_create_job(jenkins_host, jenkins_port,
+                                            jenkins_job_name):
+                raise tornado.web.HTTPError(500,
+                                            log_message="Error: failed to create Jenkins job {} on Jenkins host {}:{}".format(
+                                                jenkins_job_name, jenkins_host,
+                                                jenkins_port))
             else:
-                self.write("Success: created Jenkins job {} on Jenkins host {}:{}".format(
-                    jenkins_job_name, jenkins_host, jenkins_port))
+                self.write(
+                    'Success: created Jenkins job {} on Jenkins host {}:{}'.format(
+                        jenkins_job_name, jenkins_host, jenkins_port))
 
             utils.jenkins_build_with_params(jenkins_host, jenkins_port,
                                             jenkins_job_name, params)
             utils.ship_to_redis(namespace, repo, uniq_id, payload)
 
         else:
-            self.write_final('Error: Event type {} is not currently supported'.format(event))
-
+            raise tornado.web.HTTPError(501,
+                                        log_message="Error: Event type {} is not currently implemented.".format(
+                                            event))

@@ -9,9 +9,6 @@ This should be implemented at '/v1/destroy'.
 
 Implement proper, detailed logging.
 
-Implement proper HTTP status codes (currently everything processed by this app
-shows up as HTTP 200 to GitHub).
-
 Deployment docs exist for Python apps in general, but this project could
 probably use a few examples for Supervisor, Nginx, and HAProxy. In addition,
 we should better document deployment on Marathon and HAProxy using the

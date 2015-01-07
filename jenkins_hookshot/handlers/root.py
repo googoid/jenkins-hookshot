@@ -10,6 +10,6 @@ class RootHandler(BaseHandler):
     """
 
     def get(self):
-        self.write_final('{} v{} ({})'.format(
+        self.finish('{} v{} ({})'.format(
             __proj_name__, __proj_version__, __proj_url__
         ))

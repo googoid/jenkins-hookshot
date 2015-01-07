@@ -8,4 +8,4 @@ class PingHandler(BaseHandler):
     """
 
     def get(self):
-        self.write_final('pong')
+        self.finish('pong')
