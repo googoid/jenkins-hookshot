@@ -2,7 +2,7 @@ def basename = "${REPO_NAMESPACE}__${REPO_NAME}__${UUID}"
 
 job {
   // Ship it all to Logstash when the build completes
-  configure { ->
+  configure {project ->
     project / publishers << 'jenkins.plugins.logstash.LogstashNotifier' {
       maxLines(-1)
       failBuild(true)
