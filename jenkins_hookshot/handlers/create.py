@@ -91,7 +91,7 @@ class CreateHandler(BaseHandler):
                 'REPO_DESCRIPTION': payload['repository']['description'],
                 'REPO_URL': payload['repository']['url'],
                 'GIT_SHA': payload['after'],
-                'UUID': uniq_id
+                'UNIQ_ID': uniq_id
             }
 
             jenkins_job_name = "{}__{}__{}".format(namespace, repo, uniq_id)

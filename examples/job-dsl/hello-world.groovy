@@ -1,4 +1,4 @@
-def basename = "${REPO_NAMESPACE}__${REPO_NAME}__${UUID}"
+def basename = "${REPO_NAMESPACE}__${REPO_NAME}__${UNIQ_ID}"
 
 job {
   // Ship it all to Logstash when the build completes
