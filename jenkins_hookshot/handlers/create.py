@@ -83,12 +83,17 @@ class CreateHandler(BaseHandler):
             namespace = payload['repository']['full_name'].split('/')[0]
             repo = payload['repository']['full_name'].split('/')[1]
 
+            if payload['repository']['description'] == '':
+                repo_desc = "None"
+            else:
+                repo_desc = payload['repository']['description']
+
             # These parameters are pre-baked into 'resources/config.xml'.
             # Adding additional params here requires modifying the template.
             params = {
                 'REPO_NAMESPACE': namespace,
                 'REPO_NAME': repo,
-                'REPO_DESCRIPTION': payload['repository']['description'],
+                'REPO_DESCRIPTION': repo_desc,
                 'REPO_URL': payload['repository']['url'],
                 'GIT_SHA': payload['after'],
                 'UNIQ_ID': uniq_id
