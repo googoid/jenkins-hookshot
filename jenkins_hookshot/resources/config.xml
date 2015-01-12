@@ -6,6 +6,11 @@
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
+        <hudson.model.BooleanParameterDefinition>
+          <name>CREATE_JOBS</name>
+          <description>Boolean that can be used by a Job DSL script and seed job to either create or destroy jobs.</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>REPO_NAMESPACE</name>
           <description>The GitHub username or organization that owns the repository.</description>
@@ -67,7 +72,7 @@
       <targets>jenkins.groovy</targets>
       <usingScriptText>false</usingScriptText>
       <ignoreExisting>false</ignoreExisting>
-      <removedJobAction>IGNORE</removedJobAction>
+      <removedJobAction>DELETE</removedJobAction>
       <lookupStrategy>JENKINS_ROOT</lookupStrategy>
       <additionalClasspath/>
     </javaposse.jobdsl.plugin.ExecuteDslScripts>
