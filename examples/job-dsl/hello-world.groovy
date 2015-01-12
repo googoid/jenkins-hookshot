@@ -21,7 +21,7 @@ if ("${CREATE_JOBS}".toBoolean()) {
       shell('echo "Hello, world!"')
     }
   }
-}
 
-// Trigger the newly created job(s)
-queue("${basename}__test-job")
+  // Trigger the newly created job(s)
+  queue("${basename}__test-job")
+}
