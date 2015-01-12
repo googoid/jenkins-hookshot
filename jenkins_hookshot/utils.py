@@ -1,5 +1,8 @@
 import hmac
+import json
 import os
+from datetime import datetime
+from dateutil.tz import tzlocal
 from hashlib import sha1
 from random import randrange
 
@@ -109,10 +112,17 @@ def ship_to_redis(namespace, repo, uniq_id, payload):
     r.lpush('recent', uniq_id)
 
     # Track UUIDs for individual repos (namespace__repo)
-    r.rpush('{}__{}'.format(namespace, repo), uniq_id)
+    r.rpush('{}/{}'.format(namespace, repo), uniq_id)
 
-    # Store the original payload as a hash, with the UUID as the key
-    r.hmset(uniq_id, payload)
+    # Store the original payload as JSON, to be consumed by Logstash
+    r.rpush('hookshot', json.dumps({
+        'id': uniq_id,
+        'source': 'jenkins-hookshot',
+        'namespace': namespace,
+        'repo': repo,
+        '@timestamp': datetime.now(tzlocal()).replace(microsecond=0).isoformat(),
+        'payload': payload
+    }))
 
     # TODO: there should be actual error handling here
     return True
