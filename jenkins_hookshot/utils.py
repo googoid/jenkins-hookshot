@@ -119,7 +119,7 @@ def ship_to_redis(namespace, repo, uniq_id, payload, jenkins_url,
     r.rpush('{}/{}'.format(namespace, repo), uniq_id)
 
     # Store the original payload as JSON, to be consumed by Logstash
-    r.rpush('hookshot', json.dumps({
+    r.rpush('logstash', json.dumps({
         'id': uniq_id,
         'source': 'jenkins-hookshot',
         'namespace': namespace,
