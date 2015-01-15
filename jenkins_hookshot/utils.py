@@ -95,15 +95,19 @@ def jenkins_healthcheck(host, port):
     return result
 
 
-def ship_to_redis(namespace, repo, uniq_id, payload):
+def ship_to_redis(namespace, repo, uniq_id, payload, jenkins_url,
+                  jenkins_seed_job, jenkins_seed_job_url):
     """Ship the original GitHub payload to Redis based on the UUID for this
-    build. Track the builds for a given repo (namespace__repo) based on the
+    build. Track the builds for a given repo (namespace/repo) based on the
     UUID and index of the Redis list.
 
     :param namespace: GitHub username or organization (e.g. 'puppetlabs')
     :param repo: GitHub repository name (e.g. 'puppet')
     :param uniq_id: UUID; randomly generated on POST event to '/v1/create'
     :param payload: the original webhook payload as a Python object
+    :param jenkins_url: the URL to the Jenkins instance the jobs are created on
+    :param jenkins_seed_job: the name of the Jenkins Job DSL seed job
+    :param jenkins_seed_job_url: the URL to the Jenkins Job DSL seed job
     :return: boolean; True if successful, False otherwise
     """
     r = redis.StrictRedis(host=options.redis_host)
@@ -121,7 +125,10 @@ def ship_to_redis(namespace, repo, uniq_id, payload):
         'namespace': namespace,
         'repo': repo,
         '@timestamp': datetime.now(tzlocal()).replace(microsecond=0).isoformat(),
-        'payload': payload
+        'payload': payload,
+        'jenkins_url': jenkins_url,
+        'jenkins_seed_job': jenkins_seed_job,
+        'jenkins_seed_job_url': jenkins_seed_job_url
     }))
 
     # TODO: there should be actual error handling here

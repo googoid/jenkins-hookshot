@@ -99,21 +99,25 @@ class CreateHandler(BaseHandler):
                 'UNIQ_ID': uniq_id
             }
 
+            jenkins_url = "http://{}:{}".format(jenkins_host, jenkins_port)
             jenkins_job_name = "{}__{}__{}".format(namespace, repo, uniq_id)
+            jenkins_job_url = "{}/job/{}".format(jenkins_url, jenkins_job_name)
+
             if not utils.jenkins_create_job(jenkins_host, jenkins_port,
                                             jenkins_job_name):
                 raise tornado.web.HTTPError(500,
-                                            log_message="Error: failed to create Jenkins job {} on Jenkins host {}:{}".format(
-                                                jenkins_job_name, jenkins_host,
-                                                jenkins_port))
+                                            log_message="Error: failed to create Jenkins job {} on Jenkins host {}".format(
+                                                jenkins_job_name, jenkins_url))
             else:
                 self.write(
-                    'Success: created Jenkins job {} on Jenkins host {}:{}'.format(
-                        jenkins_job_name, jenkins_host, jenkins_port))
+                    'Success: created Jenkins job {} on Jenkins host {}'.format(
+                        jenkins_job_name, jenkins_url))
 
             utils.jenkins_build_with_params(jenkins_host, jenkins_port,
                                             jenkins_job_name, params)
-            utils.ship_to_redis(namespace, repo, uniq_id, payload)
+
+            utils.ship_to_redis(namespace, repo, uniq_id, payload, jenkins_url,
+                                jenkins_job_name, jenkins_job_url)
 
         else:
             raise tornado.web.HTTPError(501,
