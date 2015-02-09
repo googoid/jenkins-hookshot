@@ -16,3 +16,6 @@ we should better document deployment on Marathon and HAProxy using the
 
 There is no Redis error handling; the function always returns True.
 
+The marathon-python client v0.6.10 does not support Marathon 0.8.0. It is
+failing (as of 2015/02/08) due to application labels. The stacktrace shows:
+    TypeError: __init__() got an unexpected keyword argument 'labels'
