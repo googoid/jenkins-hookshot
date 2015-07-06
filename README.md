@@ -14,7 +14,7 @@ post: [Scaling Jenkins with Mesos and Marathon][5].
 
 ## Prerequisites
   * Python 3.3 (developed and tested with Python 3.3.6)
-  * Marathon 0.7.x (API v2)
+  * Marathon 0.8.x (API v2)
   * Working installations of Mesos, Marathon, and Redis
   * One or more Jenkins masters running in Marathon under a single app ID
   * pyenv and pyenv-virtualenv (recommended)
@@ -24,7 +24,6 @@ post: [Scaling Jenkins with Mesos and Marathon][5].
   * Only GitHub `ping` and `push` event actions are currently implemented.
   * The Job DSL script needs to be named `jenkins.groovy` and placed in the
   root of the Git repository.
-  * Marathon 0.8.0 is not currently supported by [marathon-python 0.6.10][9].
   * See [TODO.txt][6] for a more detailed list of tasks remaining.
 
 
